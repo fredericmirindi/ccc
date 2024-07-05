@@ -1,32 +1,37 @@
 /* Reset default browser styles */
-* {
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+}
+
+:root {
+  --primary-color: #333;
+  --secondary-color: #fff;
+  --font-family: Arial, sans-serif;
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: var(--font-family);
   line-height: 1.6;
 }
 
 header {
-  background: #333;
-  color: #fff;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
   padding: 1rem;
 }
 
 nav ul {
   list-style: none;
-}
-
-nav ul li {
-  display: inline;
-  margin-right: 1rem;
+  display: flex;
+  gap: 1rem;
 }
 
 nav ul li a {
-  color: #fff;
+  color: var(--secondary-color);
   text-decoration: none;
 }
 
@@ -34,7 +39,8 @@ section {
   padding: 2rem;
 }
 
-h1, h2 {
+h1, 
+h2 {
   margin-bottom: 1rem;
 }
 
@@ -45,8 +51,8 @@ img {
 }
 
 footer {
-  background: #333;
-  color: #fff;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
   text-align: center;
   padding: 1rem;
   margin-top: 2rem;
