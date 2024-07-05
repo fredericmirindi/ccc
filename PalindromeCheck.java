@@ -1,18 +1,24 @@
 public class PalindromeCheck {
     public static void main(String[] args) {
-        int num = 121, reversedNum = 0, remainder;
-        int originalNum = num;
+        int number = 121;
         
-        while (num != 0) {
-            remainder = num % 10;
-            reversedNum = reversedNum * 10 + remainder;
-            num /= 10;
-        }
-        
-        if (originalNum == reversedNum) {
-            System.out.println(originalNum + " is Palindrome.");
+        if (isPalindrome(number)) {
+            System.out.println(number + " is a palindrome.");
         } else {
-            System.out.println(originalNum + " is not Palindrome.");
+            System.out.println(number + " is not a palindrome.");
         }
+    }
+    
+    private static boolean isPalindrome(int number) {
+        int reversedNumber = 0;
+        int originalNumber = number;
+        
+        while (number != 0) {
+            int remainder = number % 10;
+            reversedNumber = reversedNumber * 10 + remainder;
+            number /= 10;
+        }
+        
+        return originalNumber == reversedNumber;
     }
 }
