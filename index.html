@@ -3,53 +3,397 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Analysis & Machine Learning Solutions</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>Dynamic Bayesian Game Model for PoS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .formula {
+            font-family: 'JetBrains Mono', monospace;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            background-color: rgba(255, 255, 255, 0.7);
+            display: inline-block;
+        }
+        .node {
+            transition: all 0.3s ease;
+        }
+        .node:hover {
+            filter: brightness(1.1);
+            transform: scale(1.05);
+        }
+        .connector {
+            stroke-dasharray: 5;
+            animation: dash 30s linear infinite;
+        }
+        @keyframes dash {
+            to {
+                stroke-dashoffset: 1000;
+            }
+        }
+        .pulse {
+            animation: pulse 3s infinite;
+        }
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .rotate {
+            animation: rotate 20s linear infinite;
+        }
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .tooltip {
+            visibility: hidden;
+            position: absolute;
+            background-color: #1e293b;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s;
+            max-width: 300px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .has-tooltip:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="logo">
-                <img src="assets/images/logo.png" alt="Logo" width="50">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <h1 class="text-4xl font-bold text-center mb-2 text-gray-800">Dynamic Bayesian Game Model</h1>
+        <h2 class="text-2xl font-semibold text-center mb-8 text-gray-600">For Proof-of-Stake Consensus Mechanisms</h2>
+        
+        <!-- Main Illustration -->
+        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl shadow-lg p-6 mb-12 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-purple-100 rounded-full -mr-32 -mt-32 opacity-50"></div>
+            <div class="absolute bottom-0 left-0 w-80 h-80 bg-indigo-100 rounded-full -ml-40 -mb-40 opacity-50"></div>
+            
+            <!-- SVG Illustration -->
+            <svg width="100%" height="700" viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+                <!-- Definitions for reusable elements -->
+                <defs>
+                    <!-- Gradient for time periods -->
+                    <linearGradient id="timeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#4f46e5" />
+                        <stop offset="100%" stop-color="#8b5cf6" />
+                    </linearGradient>
+                    
+                    <!-- Gradient for validators -->
+                    <linearGradient id="validatorGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#10b981" />
+                        <stop offset="100%" stop-color="#059669" />
+                    </linearGradient>
+                    
+                    <!-- Gradient for protocol parameters -->
+                    <linearGradient id="protocolGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#f59e0b" />
+                        <stop offset="100%" stop-color="#d97706" />
+                    </linearGradient>
+                    
+                    <!-- Gradient for beliefs -->
+                    <linearGradient id="beliefGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#3b82f6" />
+                        <stop offset="100%" stop-color="#2563eb" />
+                    </linearGradient>
+                    
+                    <!-- Gradient for actions -->
+                    <linearGradient id="actionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#ec4899" />
+                        <stop offset="100%" stop-color="#db2777" />
+                    </linearGradient>
+                    
+                    <!-- Gradient for payoffs -->
+                    <linearGradient id="payoffGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#6366f1" />
+                        <stop offset="100%" stop-color="#4f46e5" />
+                    </linearGradient>
+                    
+                    <!-- Arrow marker -->
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
+                    </marker>
+                    
+                    <!-- Dashed arrow marker -->
+                    <marker id="dashedarrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
+                    </marker>
+                </defs>
+                
+                <!-- Time Horizon Bar -->
+                <g class="time-horizon">
+                    <rect x="100" y="50" width="800" height="40" rx="20" fill="url(#timeGradient)" opacity="0.9" />
+                    <text x="500" y="75" text-anchor="middle" fill="white" font-weight="bold" font-size="16">Time Horizon (t=0,1,2,...,T)</text>
+                    
+                    <!-- Time periods -->
+                    <g>
+                        <circle cx="200" cy="70" r="15" fill="white" stroke="#4f46e5" stroke-width="2" />
+                        <text x="200" y="75" text-anchor="middle" fill="#4f46e5" font-weight="bold" font-size="14">t₀</text>
+                    </g>
+                    <g>
+                        <circle cx="350" cy="70" r="15" fill="white" stroke="#4f46e5" stroke-width="2" />
+                        <text x="350" y="75" text-anchor="middle" fill="#4f46e5" font-weight="bold" font-size="14">t₁</text>
+                    </g>
+                    <g>
+                        <circle cx="500" cy="70" r="15" fill="white" stroke="#4f46e5" stroke-width="2" />
+                        <text x="500" y="75" text-anchor="middle" fill="#4f46e5" font-weight="bold" font-size="14">t₂</text>
+                    </g>
+                    <g>
+                        <circle cx="650" cy="70" r="15" fill="white" stroke="#4f46e5" stroke-width="2" />
+                        <text x="650" y="75" text-anchor="middle" fill="#4f46e5" font-weight="bold" font-size="14">t₃</text>
+                    </g>
+                    <g>
+                        <circle cx="800" cy="70" r="15" fill="white" stroke="#4f46e5" stroke-width="2" />
+                        <text x="800" y="75" text-anchor="middle" fill="#4f46e5" font-weight="bold" font-size="14">t₄</text>
+                    </g>
+                </g>
+                
+                <!-- State Formula -->
+                <g class="state-formula">
+                    <rect x="300" y="120" width="400" height="60" rx="10" fill="white" stroke="#64748b" stroke-width="2" />
+                    <text x="500" y="145" text-anchor="middle" fill="#1e293b" font-size="16" font-weight="bold" class="mono">S_t ≡ (θ_(1,t), θ_(2,t), ..., θ_(n,t), λ_t)</text>
+                    <text x="500" y="165" text-anchor="middle" fill="#64748b" font-size="14">State at time t</text>
+                </g>
+                
+                <!-- Validators Section -->
+                <g class="validators-section">
+                    <rect x="100" y="220" width="250" height="180" rx="15" fill="url(#validatorGradient)" opacity="0.9" class="node" />
+                    <text x="225" y="250" text-anchor="middle" fill="white" font-weight="bold" font-size="18">Validators</text>
+                    <text x="225" y="275" text-anchor="middle" fill="white" font-size="14">N = {1, 2, ..., n}</text>
+                    
+                    <!-- Validator Types -->
+                    <rect x="125" y="290" width="200" height="40" rx="8" fill="white" opacity="0.9" />
+                    <text x="225" y="315" text-anchor="middle" fill="#059669" font-weight="500" font-size="14" class="mono">θ_(i,t) = Private Type</text>
+                    
+                    <!-- Validator Icons -->
+                    <circle cx="150" cy="360" r="15" fill="white" stroke="#059669" stroke-width="2" />
+                    <text x="150" y="365" text-anchor="middle" fill="#059669" font-weight="bold" font-size="14">1</text>
+                    
+                    <circle cx="200" cy="360" r="15" fill="white" stroke="#059669" stroke-width="2" />
+                    <text x="200" y="365" text-anchor="middle" fill="#059669" font-weight="bold" font-size="14">2</text>
+                    
+                    <circle cx="250" cy="360" r="15" fill="white" stroke="#059669" stroke-width="2" />
+                    <text x="250" y="365" text-anchor="middle" fill="#059669" font-weight="bold" font-size="14">n</text>
+                    
+                    <text x="225" y="365" text-anchor="middle" fill="white" font-weight="bold" font-size="14">...</text>
+                </g>
+                
+                <!-- Protocol Parameters Section -->
+                <g class="protocol-section">
+                    <rect x="650" y="220" width="250" height="180" rx="15" fill="url(#protocolGradient)" opacity="0.9" class="node" />
+                    <text x="775" y="250" text-anchor="middle" fill="white" font-weight="bold" font-size="18">Protocol Parameters</text>
+                    <text x="775" y="275" text-anchor="middle" fill="white" font-size="14" class="mono">λ_t = (λ_1, λ_2, ..., λ_k)</text>
+                    
+                    <!-- Parameter Examples -->
+                    <rect x="675" y="290" width="200" height="90" rx="8" fill="white" opacity="0.9" />
+                    <text x="775" y="315" text-anchor="middle" fill="#d97706" font-weight="500" font-size="14">• Reward Schedules</text>
+                    <text x="775" y="340" text-anchor="middle" fill="#d97706" font-weight="500" font-size="14">• Staking Thresholds</text>
+                    <text x="775" y="365" text-anchor="middle" fill="#d97706" font-weight="500" font-size="14">• Slashing Conditions</text>
+                </g>
+                
+                <!-- Beliefs Section -->
+                <g class="beliefs-section">
+                    <rect x="375" y="220" width="250" height="180" rx="15" fill="url(#beliefGradient)" opacity="0.9" class="node" />
+                    <text x="500" y="250" text-anchor="middle" fill="white" font-weight="bold" font-size="18">Bayesian Beliefs</text>
+                    <text x="500" y="275" text-anchor="middle" fill="white" font-size="14" class="mono">μ_(i,t)(θ_(j,t))</text>
+                    
+                    <!-- Belief Formation -->
+                    <rect x="400" y="290" width="200" height="90" rx="8" fill="white" opacity="0.9" />
+                    <text x="500" y="315" text-anchor="middle" fill="#2563eb" font-weight="500" font-size="14">Based on signals:</text>
+                    <text x="500" y="340" text-anchor="middle" fill="#2563eb" font-weight="500" font-size="14">• Transaction Patterns</text>
+                    <text x="500" y="365" text-anchor="middle" fill="#2563eb" font-weight="500" font-size="14">• Block Production Rates</text>
+                </g>
+                
+                <!-- Actions Section -->
+                <g class="actions-section">
+                    <rect x="100" y="450" width="250" height="180" rx="15" fill="url(#actionGradient)" opacity="0.9" class="node" />
+                    <text x="225" y="480" text-anchor="middle" fill="white" font-weight="bold" font-size="18">Action Spaces</text>
+                    <text x="225" y="505" text-anchor="middle" fill="white" font-size="14" class="mono">a_(i,t) ∈ A_i</text>
+                    
+                    <!-- Strategy Formula -->
+                    <rect x="125" y="520" width="200" height="40" rx="8" fill="white" opacity="0.9" />
+                    <text x="225" y="545" text-anchor="middle" fill="#db2777" font-weight="500" font-size="14" class="mono">σ_(i,t)(θ_(i,t), λ_t)</text>
+                    
+                    <!-- Action Examples -->
+                    <rect x="125" y="570" width="200" height="40" rx="8" fill="white" opacity="0.9" />
+                    <text x="225" y="595" text-anchor="middle" fill="#db2777" font-weight="500" font-size="14">Honest / Withhold / Collude</text>
+                </g>
+                
+                <!-- Payoffs Section -->
+                <g class="payoffs-section">
+                    <rect x="375" y="450" width="250" height="180" rx="15" fill="url(#payoffGradient)" opacity="0.9" class="node" />
+                    <text x="500" y="480" text-anchor="middle" fill="white" font-weight="bold" font-size="18">Payoff Dynamics</text>
+                    <text x="500" y="505" text-anchor="middle" fill="white" font-size="14" class="mono">u_i(a_(i,t), a_(-i,t), θ_t, λ_t)</text>
+                    
+                    <!-- Payoff Components -->
+                    <rect x="400" y="520" width="200" height="90" rx="8" fill="white" opacity="0.9" />
+                    <text x="500" y="545" text-anchor="middle" fill="#4f46e5" font-weight="500" font-size="14">• Block Rewards</text>
+                    <text x="500" y="570" text-anchor="middle" fill="#4f46e5" font-weight="500" font-size="14">• Transaction Fees</text>
+                    <text x="500" y="595" text-anchor="middle" fill="#4f46e5" font-weight="500" font-size="14">• Penalties / Reputation</text>
+                </g>
+                
+                <!-- Adaptive Parameters Section -->
+                <g class="adaptive-section">
+                    <rect x="650" y="450" width="250" height="180" rx="15" fill="#1e293b" opacity="0.9" class="node" />
+                    <text x="775" y="480" text-anchor="middle" fill="white" font-weight="bold" font-size="18">Adaptive Parameters</text>
+                    <text x="775" y="505" text-anchor="middle" fill="white" font-size="14" class="mono">λ_(t+1) = f(σ_t, ObservedActions_t)</text>
+                    
+                    <!-- Feedback Loop -->
+                    <rect x="675" y="520" width="200" height="90" rx="8" fill="white" opacity="0.9" />
+                    <text x="775" y="545" text-anchor="middle" fill="#1e293b" font-weight="500" font-size="14">Protocol adjusts based on:</text>
+                    <text x="775" y="570" text-anchor="middle" fill="#1e293b" font-weight="500" font-size="14">• Observed Behaviors</text>
+                    <text x="775" y="595" text-anchor="middle" fill="#1e293b" font-weight="500" font-size="14">• Network Performance</text>
+                </g>
+                
+                <!-- Total Utility Formula -->
+                <g class="utility-formula">
+                    <rect x="300" y="650" width="400" height="60" rx="10" fill="white" stroke="#64748b" stroke-width="2" />
+                    <text x="500" y="675" text-anchor="middle" fill="#1e293b" font-size="16" font-weight="bold" class="mono">U_i(θ_(i,0), λ_0) = ∑_(t=0)^T δ^t u_i(a_t, θ_t, λ_t)</text>
+                    <text x="500" y="695" text-anchor="middle" fill="#64748b" font-size="14">Total Expected Utility</text>
+                </g>
+                
+                <!-- Connections -->
+                <!-- Validators to Beliefs -->
+                <path d="M350 310 L375 310" stroke="#64748b" stroke-width="2" marker-end="url(#arrowhead)" fill="none" />
+                
+                <!-- Beliefs to Actions -->
+                <path d="M500 400 L500 430 L225 430 L225 450" stroke="#64748b" stroke-width="2" marker-end="url(#arrowhead)" fill="none" />
+                
+                <!-- Protocol to Actions -->
+                <path d="M650 310 L625 310 L625 430 L225 430" stroke="#64748b" stroke-width="2" marker-end="url(#arrowhead)" fill="none" />
+                
+                <!-- Actions to Payoffs -->
+                <path d="M350 540 L375 540" stroke="#64748b" stroke-width="2" marker-end="url(#arrowhead)" fill="none" />
+                
+                <!-- Payoffs to Adaptive -->
+                <path d="M625 540 L650 540" stroke="#64748b" stroke-width="2" marker-end="url(#arrowhead)" fill="none" />
+                
+                <!-- Adaptive back to Protocol (feedback loop) -->
+                <path d="M775 450 L775 410 L775 400" stroke="#64748b" stroke-width="2" marker-end="url(#arrowhead)" fill="none" />
+                
+                <!-- Time to all components (dashed) -->
+                <path d="M200 90 L200 220" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#dashedarrowhead)" fill="none" class="connector" />
+                <path d="M500 90 L500 220" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#dashedarrowhead)" fill="none" class="connector" />
+                <path d="M800 90 L800 220" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#dashedarrowhead)" fill="none" class="connector" />
+                
+                <!-- Dynamic elements -->
+                <g class="pulse">
+                    <circle cx="775" cy="430" r="10" fill="#f59e0b" opacity="0.6" />
+                </g>
+                
+                <g class="rotate" transform-origin="500 540">
+                    <circle cx="500" cy="540" r="8" fill="#6366f1" opacity="0.4" />
+                    <circle cx="500" cy="540" r="15" fill="none" stroke="#6366f1" stroke-width="1" opacity="0.3" />
+                </g>
+            </svg>
+        </div>
+        
+        <!-- Key Components Explanation -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-indigo-500">
+                <h3 class="text-xl font-semibold mb-3 text-indigo-700">Time Horizon and States</h3>
+                <p class="text-gray-700 mb-3">The game proceeds in discrete time periods <span class="mono font-medium">t=0,1,2,…,T</span>, potentially extending to infinity. Each period's state is defined by validators' private types and protocol parameters.</p>
+                <div class="bg-indigo-50 p-3 rounded-lg">
+                    <p class="mono text-indigo-800 font-medium">S_t ≡ (θ_(1,t), θ_(2,t), …, θ_(n,t), λ_t)</p>
+                </div>
             </div>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="services.html">Services</a></li>
-                <li><a href="portfolio.html">Portfolio</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <section class="hero">
-        <h1>Unlock Insights with Data Analysis & Machine Learning</h1>
-        <p>We help businesses leverage data to drive decisions and growth.</p>
-        <a href="contact.html" class="cta-button">Get Started</a>
-    </section>
-
-    <section class="features">
-        <h2>Why Choose Us?</h2>
-        <div class="feature-grid">
-            <div class="feature">
-                <h3>Expertise in ML</h3>
-                <p>Advanced machine learning models tailored to your business needs.</p>
+            
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-emerald-500">
+                <h3 class="text-xl font-semibold mb-3 text-emerald-700">Players, Types, and Beliefs</h3>
+                <p class="text-gray-700 mb-3">The set of validators <span class="mono font-medium">N={1,2,…,n}</span> each privately observe their type <span class="mono font-medium">θ_(i,t)</span>, which may evolve over time. Validators form Bayesian beliefs about others based on observed signals.</p>
+                <div class="bg-emerald-50 p-3 rounded-lg">
+                    <p class="mono text-emerald-800 font-medium">μ_(i,t)(θ_(j,t))</p>
+                </div>
             </div>
-            <div class="feature">
-                <h3>Data Visualization</h3>
-                <p>Interactive dashboards to make data insights accessible.</p>
+            
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-pink-500">
+                <h3 class="text-xl font-semibold mb-3 text-pink-700">Action Spaces and Strategy Profiles</h3>
+                <p class="text-gray-700 mb-3">At each time t, validator i selects an action from their action space (e.g., honest validation, block withholding). The strategy profile determines how validators choose actions based on their type and protocol parameters.</p>
+                <div class="bg-pink-50 p-3 rounded-lg">
+                    <p class="mono text-pink-800 font-medium">σ_(i,t)(θ_(i,t), λ_t)</p>
+                </div>
             </div>
-            <div class="feature">
-                <h3>Scalable Solutions</h3>
-                <p>From startups to enterprises, we deliver scalable analytics.</p>
+            
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+                <h3 class="text-xl font-semibold mb-3 text-blue-700">Payoff Dynamics and Utility</h3>
+                <p class="text-gray-700 mb-3">Validator i's instantaneous payoff includes block rewards, transaction fees, penalties, and reputation effects. The total expected utility is summed across multiple periods with a discount factor.</p>
+                <div class="bg-blue-50 p-3 rounded-lg">
+                    <p class="mono text-blue-800 font-medium">U_i(θ_(i,0), λ_0) = ∑_(t=0)^T δ^t u_i(a_t, θ_t, λ_t)</p>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-amber-500 md:col-span-2">
+                <h3 class="text-xl font-semibold mb-3 text-amber-700">Adaptive Parameters</h3>
+                <p class="text-gray-700 mb-3">After each round t, the parameter vector λ_t transitions to λ_(t+1) according to a function that depends on validators' strategies and observed outcomes. This adaptive feedback loop helps maintain both security and scalability in the long run.</p>
+                <div class="bg-amber-50 p-3 rounded-lg">
+                    <p class="mono text-amber-800 font-medium">λ_(t+1) = f(σ_t, ObservedActions_t)</p>
+                </div>
             </div>
         </div>
-    </section>
-
-    <footer>
-        <p>&copy; 2025 Data Analysis Solutions. All rights reserved.</p>
-    </footer>
-
-    <script src="js/main.js"></script>
+        
+        <!-- Interactive Elements -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg shadow p-6 text-white has-tooltip">
+                <h3 class="text-xl font-semibold mb-3">Dynamic Beliefs</h3>
+                <p class="mb-3">Validators continuously update their beliefs about others based on observed behaviors and signals from the network.</p>
+                <div class="tooltip">
+                    As validators observe each other's actions over time, they refine their beliefs about others' types and intentions, which influences their strategic decisions.
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg shadow p-6 text-white has-tooltip">
+                <h3 class="text-xl font-semibold mb-3">Adaptive Protocol</h3>
+                <p class="mb-3">The protocol parameters evolve over time in response to validator behaviors and network conditions.</p>
+                <div class="tooltip">
+                    If malicious behavior emerges or network performance degrades, the protocol can automatically adjust reward structures, staking requirements, or slashing conditions.
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg shadow p-6 text-white has-tooltip">
+                <h3 class="text-xl font-semibold mb-3">Long-term Incentives</h3>
+                <p class="mb-3">The discount factor in the utility function encourages validators to consider long-term network stability.</p>
+                <div class="tooltip">
+                    Validators with higher discount factors value future rewards more highly, making them less likely to engage in short-term exploitative behaviors that could damage the network.
+                </div>
+            </div>
+        </div>
+        
+        <!-- References -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h3 class="text-xl font-semibold mb-4 text-gray-800">References</h3>
+            <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                <li>Kiayias, A., Russell, A., David, B., & Oliynykov, R. (2016). Ouroboros: A provably secure proof-of-stake blockchain protocol.</li>
+                <li>Nguyen, C. T., Hoang, D. T., Nguyen, D. N., Niyato, D., Nguyen, H. T., & Dutkiewicz, E. (2019). Proof-of-stake consensus mechanisms for future blockchain networks.</li>
+                <li>Alzahrani, N., & Bulusu, N. (2018). Block-supply chain: A new anti-counterfeiting supply chain using NFC and blockchain.</li>
+                <li>Bala, S., & Kaur, S. (2022). Blockchain-based security solutions for IoT systems.</li>
+                <li>Li, Y., Susilo, W., Yang, G., Yu, Y., Liu, D., & Du, X. (2023). Blockchain-based access control with dynamic policy updating.</li>
+            </ul>
+        </div>
+    </div>
 </body>
 </html>
